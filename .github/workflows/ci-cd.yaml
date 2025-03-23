@@ -1,0 +1,49 @@
+# # .github/workflows/ci-cd.yml
+# name: MLOps CI/CD
+
+# on:
+#   push:
+#     branches: [ "dev", "stage", "main" ]
+#   pull_request:
+#     branches: [ "dev", "stage", "main" ]
+
+# jobs:
+#   deploy-databricks-jobs:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Check out repository
+#         uses: actions/checkout@v3
+
+#       - name: Set up Python
+#         uses: actions/setup-python@v4
+#         with:
+#           python-version: '3.10'
+
+#       - name: Install Dependencies
+#         run: |
+#           pip install --upgrade pip
+#           pip install -r requirements.txt
+#           pip install databricks-bundle
+
+#       - name: Configure Databricks CLI
+#         run: |
+#           databricks configure --host ${{ secrets.DATABRICKS_HOST }} \
+#                                --token ${{ secrets.DATABRICKS_TOKEN }} \
+#                                --profile DEFAULT --quiet
+
+#       - name: Determine environment
+#         id: envselect
+#         run: |
+#           if [[ "${GITHUB_REF_NAME}" == "dev" ]]; then
+#             echo "env_name=dev" >> $GITHUB_OUTPUT
+#           elif [[ "${GITHUB_REF_NAME}" == "stage" ]]; then
+#             echo "env_name=stage" >> $GITHUB_OUTPUT
+#           else
+#             echo "env_name=prod" >> $GITHUB_OUTPUT
+
+#       - name: Deploy Jobs
+#         env:
+#           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+#           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+#         run: |
+#           python -m cli_tool.main deploy --env ${{ steps.envselect.outputs.env_name }}
