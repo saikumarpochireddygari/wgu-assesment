@@ -32,19 +32,19 @@ class DatabricksJobCreator:
     # }
     ENV_REPO_INFO = {
         "dev": {
-            "path": "/Repos/wgu-assesment-dev",  
+            "path": "/Repos/pochireddygari@gmail.com/wgu-assesment-dev",  
             "url": "https://github.com/saikumarpochireddygari/wgu-assesment.git",
             "provider": "gitHub",
             "branch": "main"
             },
         "stage": {
-            "path": "/Repos/wgu-assesment-stage", 
+            "path": "/Repos/pochireddygari@gmail.com/wgu-assesment-stage", 
             "url": "https://github.com/saikumarpochireddygari/wgu-assesment.git",
             "provider": "gitHub",
             "branch": "main"
             },
         "prod": {
-            "path": "/Repos/wgu-assesment-prod",  
+            "path": "/Repos/pochireddygari@gmail.com/wgu-assesment-prod",  
             "url": "https://github.com/saikumarpochireddygari/wgu-assesment.git",
             "provider": "gitHub",
             "branch": "main"
@@ -106,6 +106,7 @@ class DatabricksJobCreator:
         }
         create_url = f"{host}/api/2.0/repos"
         create_resp = requests.post(create_url, headers=headers, json=create_payload)
+        print("Databricks Repos API response:", create_resp.text) 
         create_resp.raise_for_status()
         created_repo = create_resp.json()
         print(f"[{self.environment.upper()}] Created repo at path: {created_repo.get('path')}")
