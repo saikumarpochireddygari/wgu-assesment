@@ -120,7 +120,7 @@ class DatabricksJobCreator:
 
         command = [
             "databricks",
-            "bundles",
+            "bundle",
             "deploy",
             "--bundle-config",
             self.bundle_config_path
