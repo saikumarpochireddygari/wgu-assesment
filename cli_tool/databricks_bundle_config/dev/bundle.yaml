@@ -17,7 +17,7 @@ resources:
             notebook_path: "/Repos/pochireddygari@gmail.com/wgu-assesment-dev/notebooks/dev/training.ipynb"
           new_cluster:
             spark_version: "13.0.x-scala2.12"
-            node_type_id: "i3.large"
+            node_type_id: "m5d.xlarge"
             num_workers: 1
           # etc. (timeout_seconds, libraries, etc. go here if needed)
           
@@ -33,5 +33,5 @@ resources:
             notebook_path: "/Repos/pochireddygari@gmail.com/wgu-assesment-dev/notebooks/dev/inference.ipynb"
           new_cluster:
             spark_version: "13.0.x-scala2.12"
-            node_type_id: "i3.large"
+            node_type_id: "m5d.xlarge"
             num_workers: 1
