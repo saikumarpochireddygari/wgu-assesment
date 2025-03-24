@@ -31,9 +31,10 @@ jobs:
 
       - name: Configure Databricks CLI
         run: |
-          databricks configure --host ${{ secrets.DATABRICKS_HOST }} \
-                              --token ${{ secrets.DATABRICKS_TOKEN }} \
-                              --profile DEFAULT
+          mkdir -p ~/.databrickscfg
+          echo "[DEFAULT]" > ~/.databrickscfg/config
+          echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ~/.databrickscfg/config
+          echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ~/.databrickscfg/config
 
       - name: Validate Databricks credentials
         env:
