@@ -30,6 +30,7 @@ jobs:
           databricks configure --host ${{ secrets.DATABRICKS_HOST }} \
                                --token ${{ secrets.DATABRICKS_TOKEN }} \
                                --profile DEFAULT
+                               
       - name: Validate Databricks credentials
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
