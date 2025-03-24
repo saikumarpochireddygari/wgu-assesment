@@ -1,3 +1,6 @@
+
+# cli_tool/databricks_bundle_config/dev/bundle.yaml
+
 bundle:
   name: "my_mlops_bundle_dev"
 
@@ -5,9 +8,8 @@ jobs:
   - name: "my_training_job_dev"
     tasks:
       - task_key: "train_classification_model_dev"
-        # The dev Repo path for training
         notebooks:
-          - path: "/Repos/my-mlops-repo-dev/notebooks/dev/training.ipynb"
+          - path: "/Repos/pochireddygari@gmail.com/wgu-assesment-dev/notebooks/dev/training.ipynb"
         new_cluster:
           spark_version: "13.0.x-scala2.12"
           node_type_id: "i3.large"
@@ -15,23 +17,20 @@ jobs:
         libraries: []
         timeout_seconds: 1800
         schedule:
-          # e.g. run daily at 10:00
           quartz_cron_expression: "0 10 * * * ?"
           timezone_id: "UTC"
 
   - name: "my_inference_job_dev"
     tasks:
       - task_key: "run_inference_dev"
-        # The dev Repo path for inference
         notebooks:
-          - path: "/Repos/my-mlops-repo-dev/notebooks/dev/inference.ipynb"
+          - path: "/Repos/pochireddygari@gmail.com/wgu-assesment-dev/notebooks/dev/inference.ipynb"
         new_cluster:
           spark_version: "13.0.x-scala2.12"
           node_type_id: "i3.large"
           num_workers: 1
-        libraries: []
+        libraries: []  
         timeout_seconds: 1800
         schedule:
-          # e.g. run daily at 11:00
           quartz_cron_expression: "0 11 * * * ?"
           timezone_id: "UTC"
