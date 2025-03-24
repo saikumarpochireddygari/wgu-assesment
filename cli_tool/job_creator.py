@@ -9,32 +9,34 @@ import urllib.parse
 class DatabricksJobCreator:
     """
     OOP class to:
-      1. Ensure a Databricks Repo is created at /Repos/... for a given environment.
-      2. Deploy environment-specific jobs using the new Databricks CLI 'databricks bundle deploy' approach.
+      1. Ensure a Databricks Repo is created for a given environment.
+      2. Deploy environment-specific jobs using the new Databricks CLI 'databricks bundle deploy'.
     """
 
     ENV_REPO_INFO = {
         "dev": {
+            # Path in Databricks workspace
             "path": "/Repos/pochireddygari@gmail.com/wgu-assesment-dev",
+            # GitHub info
             "url": "https://github.com/saikumarpochireddygari/wgu-assesment.git",
             "provider": "gitHub",
             "branch": "main"
         },
         "stage": {
-            "path": "/Repos/pochireddygari@gmail.com/wgu-assesbld-stage",
+            "path": "/Repos/pochireddygari@gmail.com/wgu-assesment-stage",
             "url": "https://github.com/saikumarpochireddygari/wgu-assesment.git",
             "provider": "gitHub",
             "branch": "main"
         },
         "prod": {
-            "path": "/Repos/pochireddygari@gmail.com/wgu-assesbld-prod",
+            "path": "/Repos/pochireddygari@gmail.com/wgu-assesment-prod",
             "url": "https://github.com/saikumarpochireddygari/wgu-assesment.git",
             "provider": "gitHub",
             "branch": "main"
         },
     }
 
-    # Optionally, store the subfolder for each environment’s bundle.yaml
+    # The subfolder with the environment's bundle.yaml
     ENV_BUNDLE_SUBFOLDER = {
         "dev": "cli_tool/databricks_bundle_config/dev",
         "stage": "cli_tool/databricks_bundle_config/stage",
@@ -42,18 +44,11 @@ class DatabricksJobCreator:
     }
 
     def __init__(self, bundle_config_path: str, environment: str):
-        """
-        :param bundle_config_path: Path to the environment's bundle.yaml
-        :param environment: 'dev', 'stage', or 'prod'
-        """
         self.bundle_config_path = bundle_config_path
         self.environment = environment
 
     def create_repo_if_not_exists(self):
-        """
-        Calls Databricks Repos API to ensure the environment's
-        Repo path is created. If it already exists, do nothing.
-        """
+        """Create or verify the environment's Databricks Repo."""
         if self.environment not in self.ENV_REPO_INFO:
             raise ValueError(f"Environment {self.environment} not found in ENV_REPO_INFO.")
 
@@ -62,8 +57,7 @@ class DatabricksJobCreator:
         if not host or not token:
             raise ValueError("DATABRICKS_HOST or DATABRICKS_TOKEN not set.")
 
-        # remove trailing slash if present
-        host = host.rstrip("/")
+        host = host.rstrip("/")  # remove trailing slash
 
         repo_info = self.ENV_REPO_INFO[self.environment]
         repo_path = repo_info["path"]
@@ -85,10 +79,10 @@ class DatabricksJobCreator:
 
         for r in data.get("repos", []):
             if r.get("path") == repo_path:
-                print(f"[{self.environment.upper()}] Repo path '{repo_path}' already exists.")
-                return  # Found it, do nothing
+                print(f"[{self.environment.upper()}] Repo '{repo_path}' already exists.")
+                return
 
-        # 2) If not found, create it
+        # 2) Create it if not found
         create_payload = {
             "url": repo_url,
             "provider": provider,
@@ -103,22 +97,16 @@ class DatabricksJobCreator:
         print(f"[{self.environment.upper()}] Created repo at path: {created_repo.get('path')}")
 
     def deploy_jobs(self, max_retries=3):
-        """
-        Ensures the Repo path is created, then deploys Databricks jobs
-        using 'databricks bundle deploy' in the environment subfolder.
-        """
-        self.create_repo_if_not_exists()  # Make sure environment's Repo is present
+        """Runs 'databricks bundle deploy' in the environment subfolder."""
+        self.create_repo_if_not_exists()
 
-        # The new CLI expects us to 'cd' into the folder that has bundle.yaml
         subfolder = self.ENV_BUNDLE_SUBFOLDER[self.environment]
-        original_dir = os.getcwd()  # save current working dir
+        original_dir = os.getcwd()
 
         try:
-            # Change to the folder containing this environment's bundle.yaml
-            os.chdir(subfolder)
-
-            command = ["databricks", "bundle", "deploy"]  # no --bundle-config in new CLI
-            print(f"[{self.environment.upper()}] Running: {' '.join(command)} (in {subfolder})")
+            os.chdir(subfolder)  # cd to folder with bundle.yaml
+            command = ["databricks", "bundle", "deploy"]
+            print(f"[{self.environment.upper()}] Running: {' '.join(command)} in {subfolder}")
 
             for attempt in range(1, max_retries + 1):
                 try:
@@ -133,7 +121,5 @@ class DatabricksJobCreator:
                         raise RuntimeError(
                             f"[{self.environment.upper()}] Failed to deploy after {max_retries} attempts."
                         ) from e
-
         finally:
-            # Always revert back to original directory
             os.chdir(original_dir)

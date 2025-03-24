@@ -1,4 +1,3 @@
-# # .github/workflows/ci-cd.yml
 # name: MLOps CI/CD
 
 # on:
@@ -10,6 +9,7 @@
 # jobs:
 #   deploy-databricks-jobs:
 #     runs-on: ubuntu-latest
+
 #     steps:
 #       - name: Check out repository
 #         uses: actions/checkout@v3
@@ -23,7 +23,6 @@
 #         run: |
 #           pip install --upgrade pip
 #           pip install -r requirements.txt
-#           pip install databricks-bundle
 
 #       - name: Configure Databricks CLI
 #         run: |
