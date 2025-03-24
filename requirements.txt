@@ -5,4 +5,3 @@ requests>=2.20.0
 pytest>=7.0.0
 databricks-bundle
 Cython
-pyyaml==5.4.1
