@@ -5,30 +5,33 @@ resources:
   jobs:
     training_job_dev:
       name: "my_training_job_dev"
+      # Put the schedule at the job level
+      schedule:
+        quartz_cron_expression: "0 10 * * * ?"  # daily 10:00 UTC
+        timezone_id: "UTC"
+
       tasks:
         - task_key: "train_classification_model_dev"
-          notebooks:
-            - path: "/Repos/pochireddygari@gmail.com/wgu-assesment-dev/notebooks/dev/training.ipynb"
+          # Notebook task references a single notebook_path
+          notebook_task:
+            notebook_path: "/Repos/pochireddygari@gmail.com/wgu-assesment-dev/notebooks/dev/training.ipynb"
           new_cluster:
             spark_version: "13.0.x-scala2.12"
             node_type_id: "i3.large"
             num_workers: 1
-          timeout_seconds: 1800
-          schedule:
-            quartz_cron_expression: "0 10 * * * ?"   # daily 10:00 UTC
-            timezone_id: "UTC"
-
+          # etc. (timeout_seconds, libraries, etc. go here if needed)
+          
     inference_job_dev:
       name: "my_inference_job_dev"
+      schedule:
+        quartz_cron_expression: "0 11 * * * ?"  # daily 11:00 UTC
+        timezone_id: "UTC"
+
       tasks:
         - task_key: "run_inference_dev"
-          notebooks:
-            - path: "/Repos/pochireddygari@gmail.com/wgu-assesment-dev/notebooks/dev/inference.ipynb"
+          notebook_task:
+            notebook_path: "/Repos/pochireddygari@gmail.com/wgu-assesment-dev/notebooks/dev/inference.ipynb"
           new_cluster:
             spark_version: "13.0.x-scala2.12"
             node_type_id: "i3.large"
             num_workers: 1
-          timeout_seconds: 1800
-          schedule:
-            quartz_cron_expression: "0 11 * * * ?"   # daily 11:00 UTC
-            timezone_id: "UTC"
