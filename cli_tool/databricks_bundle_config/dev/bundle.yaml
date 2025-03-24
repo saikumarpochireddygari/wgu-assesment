@@ -7,7 +7,7 @@ resources:
       name: "my_training_job_dev"
       # Put the schedule at the job level
       schedule:
-        quartz_cron_expression: "0 0 1 * *"
+        quartz_cron_expression: "0 0 0 1 * ?"
         timezone_id: "UTC"
 
       tasks:
@@ -34,7 +34,7 @@ resources:
     inference_job_dev:
       name: "my_inference_job_dev"
       schedule:
-        quartz_cron_expression: "0 0 * * *"
+        quartz_cron_expression: "0 0 0 * * ?"
         timezone_id: "UTC"
 
       tasks:
