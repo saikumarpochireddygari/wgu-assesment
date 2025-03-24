@@ -14,7 +14,7 @@ resources:
         - task_key: "train_classification_model_dev"
           # Notebook task references a single notebook_path
           notebook_task:
-            notebook_path: "/Repos/pochireddygari@gmail.com/wgu-assesment-dev/notebooks/dev/training.ipynb"
+            notebook_path: "/Repos/pochireddygari@gmail.com/wgu-assesment-dev/notebooks/dev/training"
           new_cluster:
             spark_version: "13.0.x-scala2.12"
             node_type_id: "m5d.xlarge"
@@ -30,7 +30,7 @@ resources:
       tasks:
         - task_key: "run_inference_dev"
           notebook_task:
-            notebook_path: "/Repos/pochireddygari@gmail.com/wgu-assesment-dev/notebooks/dev/inference.ipynb"
+            notebook_path: "/Repos/pochireddygari@gmail.com/wgu-assesment-dev/notebooks/dev/inference"
           new_cluster:
             spark_version: "13.0.x-scala2.12"
             node_type_id: "m5d.xlarge"
