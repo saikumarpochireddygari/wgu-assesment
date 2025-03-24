@@ -44,12 +44,11 @@ jobs:
       - name: Determine environment
         id: envselect
         run: |
-          if [[ "${GITHUB_REF_NAME}" == "dev" ]]; then
-            echo "env_name=dev" >> $GITHUB_OUTPUT
-          elif [[ "${GITHUB_REF_NAME}" == "stage" ]]; then
-            echo "env_name=stage" >> $GITHUB_OUTPUT
-          else
+          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
             echo "env_name=prod" >> $GITHUB_OUTPUT
+          else
+            echo "env_name=unknown" >> $GITHUB_OUTPUT
+          fi
 
       - name: Deploy Jobs
         env:
