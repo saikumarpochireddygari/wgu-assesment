@@ -2,6 +2,7 @@
 
 import argparse
 import os
+
 from cli_tool.job_creator import DatabricksJobCreator
 
 def main():
@@ -19,8 +20,11 @@ def main():
     args = parser.parse_args()
 
     if args.command == "deploy":
-        base_dir = os.path.dirname(os.path.abspath(__file__))  # e.g., 'cli_tool/'
-        print(base_dir)
+        # We still keep a pointer to the environment-specific bundle.yaml file,
+        # but the new CLI won't use --bundle-config. We'll just store the path
+        # to confirm it exists, then let job_creator handle the chdir approach.
+
+        base_dir = os.path.dirname(os.path.abspath(__file__))  # 'cli_tool'
         config_path = os.path.join(base_dir, "databricks_bundle_config", args.env, "bundle.yaml")
 
         if not os.path.isfile(config_path):

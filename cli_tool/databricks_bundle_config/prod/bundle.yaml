@@ -6,30 +6,28 @@ jobs:
     tasks:
       - task_key: "train_classification_model_prod"
         notebooks:
-          - path: "/Repos/my-mlops-repo-prod/notebooks/prod/training.ipynb"
+          - path: "/Repos/pochireddygari@gmail.com/wgu-assesment-prod/notebooks/prod/training.ipynb"
         new_cluster:
           spark_version: "13.0.x-scala2.12"
-          node_type_id: "i3.xlarge"
-          num_workers: 4
+          node_type_id: "i3.large"
+          num_workers: 1
         libraries: []
-        timeout_seconds: 7200
+        timeout_seconds: 1800
         schedule:
-          # monthly
-          quartz_cron_expression: "0 2 1 * * ?"
+          quartz_cron_expression: "0 10 * * * ?"
           timezone_id: "UTC"
 
   - name: "my_inference_job_prod"
     tasks:
       - task_key: "run_inference_prod"
         notebooks:
-          - path: "/Repos/my-mlops-repo-prod/notebooks/prod/inference.ipynb"
+          - path: "/Repos/pochireddygari@gmail.com/wgu-assesment-prod/notebooks/prod/inference.ipynb"
         new_cluster:
           spark_version: "13.0.x-scala2.12"
-          node_type_id: "i3.xlarge"
-          num_workers: 4
-        libraries: []
-        timeout_seconds: 7200
+          node_type_id: "i3.large"
+          num_workers: 1
+        libraries: []  
+        timeout_seconds: 1800
         schedule:
-          # daily at 03:00
-          quartz_cron_expression: "0 3 * * * ?"
+          quartz_cron_expression: "0 11 * * * ?"
           timezone_id: "UTC"

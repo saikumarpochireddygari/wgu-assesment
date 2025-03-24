@@ -10,51 +10,40 @@ class DatabricksJobCreator:
     """
     OOP class to:
       1. Ensure a Databricks Repo is created at /Repos/... for a given environment.
-      2. Deploy environment-specific jobs using Databricks Asset Bundles.
+      2. Deploy environment-specific jobs using the new Databricks CLI 'databricks bundle deploy' approach.
     """
 
-    # ENV_REPO_INFO = {
-    #     "dev": {
-    #         "path": "/Repos/my-mlops-repo-dev",
-    #         "url": "https://github.com/your-org/my-mlops-repo-dev.git",
-    #         "provider": "gitHub"
-    #     },
-    #     "stage": {
-    #         "path": "/Repos/my-mlops-repo-stage",
-    #         "url": "https://github.com/your-org/my-mlops-repo-stage.git",
-    #         "provider": "gitHub"
-    #     },
-    #     "prod": {
-    #         "path": "/Repos/my-mlops-repo-prod",
-    #         "url": "https://github.com/your-org/my-mlops-repo-prod.git",
-    #         "provider": "gitHub"
-    #     },
-    # }
     ENV_REPO_INFO = {
         "dev": {
-            "path": "/Repos/pochireddygari@gmail.com/wgu-assesment-dev",  
+            "path": "/Repos/pochireddygari@gmail.com/wgu-assesment-dev",
             "url": "https://github.com/saikumarpochireddygari/wgu-assesment.git",
             "provider": "gitHub",
             "branch": "main"
-            },
+        },
         "stage": {
-            "path": "/Repos/pochireddygari@gmail.com/wgu-assesment-stage", 
+            "path": "/Repos/pochireddygari@gmail.com/wgu-assesbld-stage",
             "url": "https://github.com/saikumarpochireddygari/wgu-assesment.git",
             "provider": "gitHub",
             "branch": "main"
-            },
+        },
         "prod": {
-            "path": "/Repos/pochireddygari@gmail.com/wgu-assesment-prod",  
+            "path": "/Repos/pochireddygari@gmail.com/wgu-assesbld-prod",
             "url": "https://github.com/saikumarpochireddygari/wgu-assesment.git",
             "provider": "gitHub",
             "branch": "main"
         },
     }
 
+    # Optionally, store the subfolder for each environment’s bundle.yaml
+    ENV_BUNDLE_SUBFOLDER = {
+        "dev": "cli_tool/databricks_bundle_config/dev",
+        "stage": "cli_tool/databricks_bundle_config/stage",
+        "prod": "cli_tool/databricks_bundle_config/prod",
+    }
 
     def __init__(self, bundle_config_path: str, environment: str):
         """
-        :param bundle_config_path: Path to the Databricks Asset Bundles YAML file.
+        :param bundle_config_path: Path to the environment's bundle.yaml
         :param environment: 'dev', 'stage', or 'prod'
         """
         self.bundle_config_path = bundle_config_path
@@ -80,6 +69,7 @@ class DatabricksJobCreator:
         repo_path = repo_info["path"]
         repo_url = repo_info["url"]
         provider = repo_info["provider"]
+        branch = repo_info.get("branch", "main")
 
         headers = {
             "Authorization": f"Bearer {token}",
@@ -102,11 +92,12 @@ class DatabricksJobCreator:
         create_payload = {
             "url": repo_url,
             "provider": provider,
-            "path": repo_path
+            "path": repo_path,
+            "branch": branch
         }
         create_url = f"{host}/api/2.0/repos"
         create_resp = requests.post(create_url, headers=headers, json=create_payload)
-        print("Databricks Repos API response:", create_resp.text) 
+        print("Databricks Repos API response:", create_resp.text)
         create_resp.raise_for_status()
         created_repo = create_resp.json()
         print(f"[{self.environment.upper()}] Created repo at path: {created_repo.get('path')}")
@@ -114,29 +105,35 @@ class DatabricksJobCreator:
     def deploy_jobs(self, max_retries=3):
         """
         Ensures the Repo path is created, then deploys Databricks jobs
-        using 'databricks bundles deploy'.
+        using 'databricks bundle deploy' in the environment subfolder.
         """
         self.create_repo_if_not_exists()  # Make sure environment's Repo is present
 
-        command = [
-            "databricks",
-            "bundle",
-            "deploy",
-            "--bundle-config",
-            self.bundle_config_path
-        ]
+        # The new CLI expects us to 'cd' into the folder that has bundle.yaml
+        subfolder = self.ENV_BUNDLE_SUBFOLDER[self.environment]
+        original_dir = os.getcwd()  # save current working dir
 
-        print(f"[{self.environment.upper()}] Deploying jobs with: {' '.join(command)}")
-        for attempt in range(1, max_retries + 1):
-            try:
-                subprocess.run(command, check=True)
-                print(f"[{self.environment.upper()}] Successfully deployed Databricks Jobs.")
-                return
-            except subprocess.CalledProcessError as e:
-                print(f"[{self.environment.upper()}] Attempt {attempt} failed: {e}")
-                if attempt < max_retries:
-                    time.sleep(5)
-                else:
-                    raise RuntimeError(
-                        f"[{self.environment.upper()}] Failed to deploy after {max_retries} attempts."
-                    ) from e
+        try:
+            # Change to the folder containing this environment's bundle.yaml
+            os.chdir(subfolder)
+
+            command = ["databricks", "bundle", "deploy"]  # no --bundle-config in new CLI
+            print(f"[{self.environment.upper()}] Running: {' '.join(command)} (in {subfolder})")
+
+            for attempt in range(1, max_retries + 1):
+                try:
+                    subprocess.run(command, check=True)
+                    print(f"[{self.environment.upper()}] Successfully deployed Databricks Jobs.")
+                    return
+                except subprocess.CalledProcessError as e:
+                    print(f"[{self.environment.upper()}] Attempt {attempt} failed: {e}")
+                    if attempt < max_retries:
+                        time.sleep(5)
+                    else:
+                        raise RuntimeError(
+                            f"[{self.environment.upper()}] Failed to deploy after {max_retries} attempts."
+                        ) from e
+
+        finally:
+            # Always revert back to original directory
+            os.chdir(original_dir)
