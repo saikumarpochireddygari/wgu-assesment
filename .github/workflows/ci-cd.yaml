@@ -25,11 +25,15 @@ jobs:
           pip install --upgrade pip
           pip install --only-binary=pyyaml -r requirements.txt
 
+      - name: Check Databricks CLI version
+        run: |
+          databricks --version
+
       - name: Configure Databricks CLI
         run: |
           databricks configure --host ${{ secrets.DATABRICKS_HOST }} \
-                               --token ${{ secrets.DATABRICKS_TOKEN }} \
-                               --profile DEFAULT --quiet
+                              --token ${{ secrets.DATABRICKS_TOKEN }} \
+                              --profile DEFAULT
 
       - name: Validate Databricks credentials
         env:
