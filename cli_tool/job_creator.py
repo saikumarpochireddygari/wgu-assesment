@@ -1,5 +1,3 @@
-# cli_tool/job_creator.py
-
 import subprocess
 import time
 import os
@@ -9,7 +7,7 @@ import urllib.parse
 class DatabricksJobCreator:
     """
     OOP class to:
-      1. Ensure a Databricks Repo is created for a given environment.
+      1. Ensure a Databricks Repo is created or updated for a given environment.
       2. Deploy environment-specific jobs using the new Databricks CLI 'databricks bundle deploy'.
     """
 
@@ -47,8 +45,24 @@ class DatabricksJobCreator:
         self.bundle_config_path = bundle_config_path
         self.environment = environment
 
+    def update_repo(self, host: str, token: str, repo_id: int, branch: str):
+        """
+        Force-update the existing repo to the given branch,
+        pulling latest changes from remote.
+        """
+        update_url = f"{host}/api/2.0/repos/{repo_id}"
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json"
+        }
+        payload = {"branch": branch}
+
+        resp = requests.patch(update_url, headers=headers, json=payload)
+        resp.raise_for_status()
+        print(f"[{self.environment.upper()}] Repo ID {repo_id} updated to branch '{branch}'.")
+
     def create_repo_if_not_exists(self):
-        """Create or verify the environment's Databricks Repo."""
+        """Create or force-update the environment's Databricks Repo."""
         if self.environment not in self.ENV_REPO_INFO:
             raise ValueError(f"Environment {self.environment} not found in ENV_REPO_INFO.")
 
@@ -77,27 +91,35 @@ class DatabricksJobCreator:
         resp.raise_for_status()
         data = resp.json()
 
+        found_repo = None
         for r in data.get("repos", []):
             if r.get("path") == repo_path:
-                print(f"[{self.environment.upper()}] Repo '{repo_path}' already exists.")
-                return
+                found_repo = r
+                break
 
-        # 2) Create it if not found
-        create_payload = {
-            "url": repo_url,
-            "provider": provider,
-            "path": repo_path,
-            "branch": branch
-        }
-        create_url = f"{host}/api/2.0/repos"
-        create_resp = requests.post(create_url, headers=headers, json=create_payload)
-        print("Databricks Repos API response:", create_resp.text)
-        create_resp.raise_for_status()
-        created_repo = create_resp.json()
-        print(f"[{self.environment.upper()}] Created repo at path: {created_repo.get('path')}")
+        if found_repo:
+            # Force-update the existing repo
+            print(f"[{self.environment.upper()}] Repo '{repo_path}' already exists. Updating to branch '{branch}'...")
+            self.update_repo(host, token, found_repo["id"], branch)
+        else:
+            # Create it if not found
+            print(f"[{self.environment.upper()}] Repo '{repo_path}' not found. Creating new repo...")
+            create_payload = {
+                "url": repo_url,
+                "provider": provider,
+                "path": repo_path,
+                "branch": branch
+            }
+            create_url = f"{host}/api/2.0/repos"
+            create_resp = requests.post(create_url, headers=headers, json=create_payload)
+            print("Databricks Repos API response:", create_resp.text)
+            create_resp.raise_for_status()
+            created_repo = create_resp.json()
+            print(f"[{self.environment.upper()}] Created repo at path: {created_repo.get('path')}")
 
     def deploy_jobs(self, max_retries=3):
         """Runs 'databricks bundle deploy' in the environment subfolder."""
+        # First create or update the repo
         self.create_repo_if_not_exists()
 
         subfolder = self.ENV_BUNDLE_SUBFOLDER[self.environment]
