@@ -22,8 +22,8 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install --upgrade pip setuptools wheel
-          pip install -r requirements.txt
+          pip install --upgrade pip
+          pip install --only-binary=pyyaml -r requirements.txt
 
       - name: Configure Databricks CLI
         run: |
