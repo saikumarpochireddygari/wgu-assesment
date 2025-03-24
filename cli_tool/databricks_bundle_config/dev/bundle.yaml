@@ -35,3 +35,4 @@ resources:
           schedule:
             quartz_cron_expression: "0 11 * * * ?"
             timezone_id: "UTC"
+
