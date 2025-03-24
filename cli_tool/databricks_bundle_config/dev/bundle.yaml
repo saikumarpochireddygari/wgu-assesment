@@ -7,7 +7,7 @@ resources:
       name: "my_training_job_dev"
       # Put the schedule at the job level
       schedule:
-        quartz_cron_expression: "0 10 * * * ?"  # daily 10:00 UTC
+        quartz_cron_expression: "0 0 1 * *"
         timezone_id: "UTC"
 
       tasks:
@@ -15,8 +15,18 @@ resources:
           # Notebook task references a single notebook_path
           notebook_task:
             notebook_path: "/Repos/pochireddygari@gmail.com/wgu-assesment-dev/notebooks/dev/training"
+            base_parameters:
+              catalog_name: "prod_catalog"
+              schema_name: "ml_models"
+              model_name: "iris_model"
+              exp_name: "/Shared/prod_experiment"
+              model_description: "Iris Flower Classification model used for predicting type of Flowers"
+              model_category: "classification"
+              owner: "pochireddygari@gmail.com"
+              project: "Iris Project"
+              team: "Team MLOps"
           new_cluster:
-            spark_version: "13.0.x-scala2.12"
+            spark_version: "13.3.x-cpu-ml-scala2.12"
             node_type_id: "m5d.xlarge"
             num_workers: 1
           # etc. (timeout_seconds, libraries, etc. go here if needed)
@@ -24,14 +34,19 @@ resources:
     inference_job_dev:
       name: "my_inference_job_dev"
       schedule:
-        quartz_cron_expression: "0 11 * * * ?"  # daily 11:00 UTC
+        quartz_cron_expression: "0 0 * * *"
         timezone_id: "UTC"
 
       tasks:
         - task_key: "run_inference_dev"
           notebook_task:
             notebook_path: "/Repos/pochireddygari@gmail.com/wgu-assesment-dev/notebooks/dev/inference"
+            base_parameters:
+              catalog_name: "prod_catalog"
+              schema_name: "ml_models"
+              model_name: "iris_model"
+              version: "production"
           new_cluster:
-            spark_version: "13.0.x-scala2.12"
+            spark_version: "13.3.x-cpu-ml-scala2.12"
             node_type_id: "m5d.xlarge"
             num_workers: 1
