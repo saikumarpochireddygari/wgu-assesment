@@ -3,7 +3,7 @@ bundle:
 
 resources:
   jobs:
-    training_job_prod:
+    production_workflow_iris_model_training_project_iris:
       name: "production_workflow_iris_model_training_project_iris"
       schedule:
         quartz_cron_expression: "0 0 0 1 * ?"
@@ -28,7 +28,7 @@ resources:
             node_type_id: "m5d.xlarge"
             num_workers: 1
           
-    inference_job_prod:
+    production_workflow_iris_model_batch_inference_project_iris:
       name: "production_workflow_iris_model_batch_inference_project_iris"
       schedule:
         quartz_cron_expression: "0 0 0 * * ?"
