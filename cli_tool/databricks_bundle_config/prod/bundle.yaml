@@ -4,15 +4,13 @@ bundle:
 resources:
   jobs:
     training_job_prod:
-      name: "my_training_job_prod"
-      # Put the schedule at the job level
+      name: "production_workflow_iris_model_training_project_iris"
       schedule:
         quartz_cron_expression: "0 0 0 1 * ?"
         timezone_id: "UTC"
 
       tasks:
         - task_key: "train_classification_model_prod"
-          # Notebook task references a single notebook_path
           notebook_task:
             notebook_path: "/Repos/pochireddygari@gmail.com/wgu-assesment-prod/notebooks/prod/training"
             base_parameters:
@@ -29,10 +27,9 @@ resources:
             spark_version: "13.3.x-cpu-ml-scala2.12"
             node_type_id: "m5d.xlarge"
             num_workers: 1
-          # etc. (timeout_seconds, libraries, etc. go here if needed)
           
     inference_job_prod:
-      name: "my_inference_job_prod"
+      name: "production_workflow_iris_model_batch_inference_project_iris"
       schedule:
         quartz_cron_expression: "0 0 0 * * ?"
         timezone_id: "UTC"

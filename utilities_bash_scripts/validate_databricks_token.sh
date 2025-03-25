@@ -3,13 +3,13 @@
 set -e  # Exit immediately if any command fails
 set -o pipefail  # Capture pipe command failures
 
-# Input validation
+# Input validation -Checking for Token & Host
 if [[ -z "$DATABRICKS_HOST" || -z "$DATABRICKS_TOKEN" ]]; then
   echo "❌ Missing required environment variables: DATABRICKS_HOST or DATABRICKS_TOKEN"
   exit 1
 fi
 
-# Base API URL
+# Base API URL - Constructing API_URL
 API_URL="${DATABRICKS_HOST}/api/2.0"
 
 # Check authentication
@@ -21,7 +21,7 @@ curl -sS -X GET \
   exit 101
 }
 
-# Check jobs permissions
+# Check jobs permissions for User
 echo "🔧 Checking jobs/create permission..."
 curl -sS -X POST \
   -H "Authorization: Bearer ${DATABRICKS_TOKEN}" \
@@ -32,4 +32,5 @@ curl -sS -X POST \
   exit 102
 }
 
+# Response
 echo "✅ All Databricks permissions validated successfully"

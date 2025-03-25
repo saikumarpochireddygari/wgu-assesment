@@ -1,4 +1,4 @@
-name: MLOps Production Deploy
+name: ML Production Workflow
 
 on:
   push:
@@ -9,34 +9,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository
+      - name: Checking out the Current Repo
         uses: actions/checkout@v3
 
-      - name: Databricks CLI Setup
+      - name: Setting up Databricks CLI
         uses: databricks/setup-cli@main
 
-      - name: Set up Python
+      - name: Setting up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
 
-      - name: Install Dependencies
+      - name: Installing Python Dependencies
         run: |
           pip install --upgrade pip
           pip install --only-binary=pyyaml -r requirements.txt
 
-      - name: Check Databricks CLI version
+      - name: Checking for Databricks CLI version
         run: |
           databricks --version
 
-      - name: Configure Databricks CLI
+      - name: Configuring Databricks CLI
         run: |
           mkdir -p ~/.databrickscfg
           echo "[DEFAULT]" > ~/.databrickscfg/config
           echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ~/.databrickscfg/config
           echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ~/.databrickscfg/config
 
-      - name: Validate Databricks credentials
+      - name: Validating User level Permissions For Databricks 
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
@@ -56,7 +56,7 @@ jobs:
             echo "env_name=unknown" >> $GITHUB_OUTPUT
           fi
 
-      - name: Deploy Jobs
+      - name: Deploying Jobs to Databricks
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
