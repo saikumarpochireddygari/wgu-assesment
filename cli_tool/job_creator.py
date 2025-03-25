@@ -16,11 +16,11 @@ Usage:
       - Verify (or create/update) the Databricks Repo.
       - Change into the directory containing the bundle.yaml.
       - Execute "databricks bundle deploy" to deploy the defined jobs.
-      
+
 Environment Variables:
     DATABRICKS_HOST  - The host URL for the Databricks workspace.
     DATABRICKS_TOKEN - The personal access token for authenticating with the Databricks REST API.
-      
+
 Example:
     python -m cli_tool.main deploy --env dev
 
@@ -33,6 +33,7 @@ import os
 import requests
 import urllib.parse
 
+
 class DatabricksJobCreator:
     """
     OOP class to:
@@ -43,25 +44,25 @@ class DatabricksJobCreator:
     # Environment-specific information for the Databricks Repos.
     # Each environment (dev, stage, prod) must have its own Databricks Repo path.
     # GitHub repository URL, provider, and target branch.
-    #In my Case, I want my main branch code to be deployed/Checked across various repos paths of DBCks Workspace.
+    # In my Case, I want my main branch code to be deployed/Checked across various repos paths of DBCks Workspace.
     ENV_REPO_INFO = {
         "dev": {
             "path": "/Repos/pochireddygari@gmail.com/wgu-assesment-dev",
             "url": "https://github.com/saikumarpochireddygari/wgu-assesment.git",
             "provider": "gitHub",
-            "branch": "main"
+            "branch": "main",
         },
         "stage": {
             "path": "/Repos/pochireddygari@gmail.com/wgu-assesment-stage",
             "url": "https://github.com/saikumarpochireddygari/wgu-assesment.git",
             "provider": "gitHub",
-            "branch": "main"
+            "branch": "main",
         },
         "prod": {
             "path": "/Repos/pochireddygari@gmail.com/wgu-assesment-prod",
             "url": "https://github.com/saikumarpochireddygari/wgu-assesment.git",
             "provider": "gitHub",
-            "branch": "main"
+            "branch": "main",
         },
     }
 
@@ -80,7 +81,7 @@ class DatabricksJobCreator:
             bundle_config_path (str): Path to the environment-specific bundle.yaml configuration file.
             environment (str): The target environment (dev, stage, or prod).
         """
-        
+
         self.bundle_config_path = bundle_config_path
         self.environment = environment
 
@@ -101,13 +102,15 @@ class DatabricksJobCreator:
         update_url = f"{host}/api/2.0/repos/{repo_id}"
         headers = {
             "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         }
         payload = {"branch": branch}
 
         resp = requests.patch(update_url, headers=headers, json=payload)
         resp.raise_for_status()
-        print(f"[{self.environment.upper()}] Repo ID {repo_id} updated to branch '{branch}'.")
+        print(
+            f"[{self.environment.upper()}] Repo ID {repo_id} updated to branch '{branch}'."
+        )
 
     def create_repo_if_not_exists(self):
         """
@@ -119,7 +122,9 @@ class DatabricksJobCreator:
         """
 
         if self.environment not in self.ENV_REPO_INFO:
-            raise ValueError(f"Environment {self.environment} not found in ENV_REPO_INFO.")
+            raise ValueError(
+                f"Environment {self.environment} not found in ENV_REPO_INFO."
+            )
 
         host = os.getenv("DATABRICKS_HOST")
         token = os.getenv("DATABRICKS_TOKEN")
@@ -136,11 +141,11 @@ class DatabricksJobCreator:
 
         headers = {
             "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         }
 
         # Check if the Repo path already exists
-        path_prefix = urllib.parse.quote(repo_path, safe='')
+        path_prefix = urllib.parse.quote(repo_path, safe="")
         check_url = f"{host}/api/2.0/repos?path_prefix={path_prefix}"
         resp = requests.get(check_url, headers=headers)
         resp.raise_for_status()
@@ -155,23 +160,31 @@ class DatabricksJobCreator:
 
         if found_repo:
             # If the repo exists, update it to the desired branch.
-            print(f"[{self.environment.upper()}] Repo '{repo_path}' already exists. Updating to branch '{branch}'...")
+            print(
+                f"[{self.environment.upper()}] Repo '{repo_path}' already exists. Updating to branch '{branch}'..."
+            )
             self.update_repo(host, token, found_repo["id"], branch)
         else:
             # If the repo does not exist, create it.
-            print(f"[{self.environment.upper()}] Repo '{repo_path}' not found. Creating new repo...")
+            print(
+                f"[{self.environment.upper()}] Repo '{repo_path}' not found. Creating new repo..."
+            )
             create_payload = {
                 "url": repo_url,
                 "provider": provider,
                 "path": repo_path,
-                "branch": branch
+                "branch": branch,
             }
             create_url = f"{host}/api/2.0/repos"
-            create_resp = requests.post(create_url, headers=headers, json=create_payload)
+            create_resp = requests.post(
+                create_url, headers=headers, json=create_payload
+            )
             print("Databricks Repos API response:", create_resp.text)
             create_resp.raise_for_status()
             created_repo = create_resp.json()
-            print(f"[{self.environment.upper()}] Created repo at path: {created_repo.get('path')}")
+            print(
+                f"[{self.environment.upper()}] Created repo at path: {created_repo.get('path')}"
+            )
 
     def deploy_jobs(self, max_retries=3):
         """
@@ -184,8 +197,8 @@ class DatabricksJobCreator:
           4. Retries deployment up to max_retries if failures occur.
           5. Restores the original working directory regardless of success or failure.
         """
-        
-        # First create or update the repo 
+
+        # First create or update the repo
         self.create_repo_if_not_exists()
 
         # Looking up the subfolder where the environment bundle.yaml resides.
@@ -195,21 +208,25 @@ class DatabricksJobCreator:
         try:
             os.chdir(subfolder)  # Change directory to where bundle.yaml is located
             command = ["databricks", "bundle", "deploy"]
-            print(f"[{self.environment.upper()}] Running: {' '.join(command)} in {subfolder}")
+            print(
+                f"[{self.environment.upper()}] Running: {' '.join(command)} in {subfolder}"
+            )
 
             # Attempt to deploy the bundle with retries.
             for attempt in range(1, max_retries + 1):
                 try:
                     subprocess.run(command, check=True)
-                    print(f"[{self.environment.upper()}] Successfully deployed Databricks Jobs.")
-                    return # Exit on success
+                    print(
+                        f"[{self.environment.upper()}] Successfully deployed Databricks Jobs."
+                    )
+                    return  # Exit on success
                 except subprocess.CalledProcessError as e:
                     print(f"[{self.environment.upper()}] Attempt {attempt} failed: {e}")
                     if attempt < max_retries:
-                        time.sleep(5) # Wait before retrying
+                        time.sleep(5)  # Wait before retrying
                     else:
                         raise RuntimeError(
                             f"[{self.environment.upper()}] Failed to deploy after {max_retries} attempts."
                         ) from e
         finally:
-            os.chdir(original_dir) # Always revert back to the original directory
+            os.chdir(original_dir)  # Always revert back to the original directory

@@ -24,6 +24,12 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install --only-binary=pyyaml -r requirements.txt
+      
+      - name: Run code quality checks
+        run: |
+          set -euxo pipefail
+          black --check cli_tool/
+          flake8 cli_tool/ --max-line-length 150
 
       - name: Checking for Databricks CLI version
         run: |
