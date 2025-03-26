@@ -151,7 +151,7 @@ class DatabricksJobCreator:
             "Content-Type": "application/json",
         }
 
-        # Check if the Repo path already exists
+        # Checking if the Repo path already exists
         path_prefix = urllib.parse.quote(repo_path, safe="")
         check_url = f"{host}/api/2.0/repos?path_prefix={path_prefix}"
         resp = requests.get(check_url, headers=headers)
@@ -159,7 +159,7 @@ class DatabricksJobCreator:
         data = resp.json()
 
         found_repo = None
-        # Look through returned repos to see if one matches our target path.
+        # Looking through returned repos to see if one matches our target path.
         for r in data.get("repos", []):
             if r.get("path") == repo_path:
                 found_repo = r
@@ -205,7 +205,7 @@ class DatabricksJobCreator:
           5. Restores the original working directory regardless of success or failure.
         """
 
-        # First create or update the repo
+        # First we create or update the repo
         self.create_repo_if_not_exists()
 
         # Looking up the subfolder where the environment bundle.yaml resides.
@@ -213,7 +213,7 @@ class DatabricksJobCreator:
         original_dir = os.getcwd()
 
         try:
-            os.chdir(subfolder)  # Change directory to where bundle.yaml is located
+            os.chdir(subfolder)  # Changing directory to where bundle.yaml is located
             command = ["databricks", "bundle", "deploy"]
             print(
                 f"[{self.environment.upper()}] Running: {' '.join(command)} in {subfolder}"
@@ -236,4 +236,4 @@ class DatabricksJobCreator:
                             f"[{self.environment.upper()}] Failed to deploy after {max_retries} attempts."
                         ) from e
         finally:
-            os.chdir(original_dir)  # Always revert back to the original directory
+            os.chdir(original_dir)  # Always we revert back to the original directory

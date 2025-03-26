@@ -26,7 +26,7 @@ from cli_tool.job_creator import DatabricksJobCreator
 class TestJobCreatorIntegration(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        # Retrieve credentials from environment variables.
+        # Retrieving credentials from environment variables.
         cls.host = os.getenv("DATABRICKS_HOST")
         cls.token = os.getenv("DATABRICKS_TOKEN")
         if not cls.host or not cls.token:
@@ -36,9 +36,9 @@ class TestJobCreatorIntegration(unittest.TestCase):
             "Authorization": f"Bearer {cls.token}",
             "Content-Type": "application/json",
         }
-        # Use a dedicated test environment (adjust as needed).
+        # Using a dedicated test environment
         cls.env = "test"
-        # Ensure the ENV_REPO_INFO has an entry for 'test'.  (You might need to add this in your job_creator.py.)
+        # Fetching path
         cls.repo_path = DatabricksJobCreator.ENV_REPO_INFO[cls.env]["path"]
 
     def test_create_update_and_cleanup_repo_and_jobs(self):
@@ -52,11 +52,10 @@ class TestJobCreatorIntegration(unittest.TestCase):
         bundle_config_path = "cli_tool/databricks_bundle_config/test/bundle.yaml"
         creator = DatabricksJobCreator(bundle_config_path, self.env)
 
-        # Deploy jobs (this will create/update the repo and attempt to deploy jobs).
-        # We set max_retries=1 to speed up the test.
+        # Deploying job (this will create/update the repo and attempt to deploy jobs)
         creator.deploy_jobs(max_retries=1)
 
-        # Verify the repo exists using the Databricks Repos API.
+        # Verifying the repo exists using the Databricks Repos API.
         path_prefix = quote(self.repo_path, safe="")
         get_url = f"{self.host}/api/2.0/repos?path_prefix={path_prefix}"
         resp = requests.get(get_url, headers=self.headers)
@@ -69,7 +68,7 @@ class TestJobCreatorIntegration(unittest.TestCase):
                 break
         self.assertIsNotNone(repo_found, "Test repo should exist after deployment.")
 
-        # Delete the created repo.
+        # Deleting the created repo.
         repo_id = repo_found.get("id")
         self.assertIsNotNone(repo_id, "Repo ID should be available for cleanup.")
         delete_url = f"{self.host}/api/2.0/repos/{repo_id}"
@@ -77,17 +76,17 @@ class TestJobCreatorIntegration(unittest.TestCase):
         self.assertEqual(del_resp.status_code, 200, "Expected a 200 OK response when deleting the repo.")
         print("Cleanup: Repo deleted successfully.")
 
-        # --- Additional Cleanup: Delete the Jobs ---
-        # List all jobs using the Jobs API (v2.1).
+        
+        # Listing all jobs using the Jobs API
         jobs_url = f"{self.host}/api/2.1/jobs/list"
         jobs_resp = requests.get(jobs_url, headers=self.headers)
         self.assertEqual(jobs_resp.status_code, 200, "Expected a 200 OK from the jobs list API.")
         jobs_data = jobs_resp.json()
 
-        # Define the job names that your bundle creates; adjust these names as needed.
-        jobs_to_delete = ["my_training_job_test", "my_inference_job_test"]
+        jobs_to_delete = ["my_training_job_test"]
         deleted_jobs = []
-
+        
+        # deleting the test job
         for job in jobs_data.get("jobs", []):
             job_name = job.get("settings", {}).get("name", "")
             if job_name in jobs_to_delete:
