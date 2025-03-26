@@ -30,7 +30,9 @@ class TestJobCreatorIntegration(unittest.TestCase):
         cls.host = os.getenv("DATABRICKS_HOST")
         cls.token = os.getenv("DATABRICKS_TOKEN")
         if not cls.host or not cls.token:
-            raise Exception("DATABRICKS_HOST and DATABRICKS_TOKEN must be set for integration tests.")
+            raise Exception(
+                "DATABRICKS_HOST and DATABRICKS_TOKEN must be set for integration tests."
+            )
         cls.host = cls.host.rstrip("/")
         cls.headers = {
             "Authorization": f"Bearer {cls.token}",
@@ -59,7 +61,9 @@ class TestJobCreatorIntegration(unittest.TestCase):
         path_prefix = quote(self.repo_path, safe="")
         get_url = f"{self.host}/api/2.0/repos?path_prefix={path_prefix}"
         resp = requests.get(get_url, headers=self.headers)
-        self.assertEqual(resp.status_code, 200, "Expected a 200 OK from the repos GET request.")
+        self.assertEqual(
+            resp.status_code, 200, "Expected a 200 OK from the repos GET request."
+        )
         data = resp.json()
         repo_found = None
         for r in data.get("repos", []):
@@ -73,31 +77,41 @@ class TestJobCreatorIntegration(unittest.TestCase):
         self.assertIsNotNone(repo_id, "Repo ID should be available for cleanup.")
         delete_url = f"{self.host}/api/2.0/repos/{repo_id}"
         del_resp = requests.delete(delete_url, headers=self.headers)
-        self.assertEqual(del_resp.status_code, 200, "Expected a 200 OK response when deleting the repo.")
+        self.assertEqual(
+            del_resp.status_code,
+            200,
+            "Expected a 200 OK response when deleting the repo.",
+        )
         print("Cleanup: Repo deleted successfully.")
 
-        
         # Listing all jobs using the Jobs API
         jobs_url = f"{self.host}/api/2.1/jobs/list"
         jobs_resp = requests.get(jobs_url, headers=self.headers)
-        self.assertEqual(jobs_resp.status_code, 200, "Expected a 200 OK from the jobs list API.")
+        self.assertEqual(
+            jobs_resp.status_code, 200, "Expected a 200 OK from the jobs list API."
+        )
         jobs_data = jobs_resp.json()
 
         jobs_to_delete = ["my_training_job_test"]
         deleted_jobs = []
-        
+
         # deleting the test job
         for job in jobs_data.get("jobs", []):
             job_name = job.get("settings", {}).get("name", "")
             if job_name in jobs_to_delete:
                 job_id = job.get("job_id")
-                self.assertIsNotNone(job_id, f"Job ID for {job_name} should be available for cleanup.")
+                self.assertIsNotNone(
+                    job_id, f"Job ID for {job_name} should be available for cleanup."
+                )
                 delete_payload = {"job_id": job_id}
                 delete_job_url = f"{self.host}/api/2.1/jobs/delete"
-                del_job_resp = requests.post(delete_job_url, headers=self.headers, json=delete_payload)
+                del_job_resp = requests.post(
+                    delete_job_url, headers=self.headers, json=delete_payload
+                )
                 self.assertEqual(
-                    del_job_resp.status_code, 200,
-                    f"Expected a 200 OK response when deleting job {job_name}."
+                    del_job_resp.status_code,
+                    200,
+                    f"Expected a 200 OK response when deleting job {job_name}.",
                 )
                 deleted_jobs.append(job_name)
         print("Cleanup: Deleted jobs:", deleted_jobs)

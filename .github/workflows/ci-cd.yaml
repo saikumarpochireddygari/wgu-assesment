@@ -29,6 +29,7 @@ jobs:
         run: |
           set -euxo pipefail
           black --check cli_tool/
+          black --check tests/
           flake8 cli_tool/ --max-line-length 150
 
       - name: Checking for Databricks CLI version
