@@ -19,4 +19,4 @@ if ! echo "${USER_EMAIL}" | grep -qE "(${ALLOWED_USERS%|})"; then
 fi
 
 # Response
-echo "✅ Authorized user: ${USER_EMAIL}"
+echo "✅ Authorized user: ${ALLOWED_USERS%|}"
