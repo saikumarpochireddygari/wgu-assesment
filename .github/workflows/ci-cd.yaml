@@ -52,6 +52,10 @@ jobs:
           chmod +x ./utilities_bash_scripts/validate_databricks_token.sh
           ./utilities_bash_scripts/validate_user.sh
           ./utilities_bash_scripts/validate_databricks_token.sh
+       
+      - name: Run Integration Tests
+        run: |
+          pytest tests/
 
       - name: Determine environment
         id: envselect

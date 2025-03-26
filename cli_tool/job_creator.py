@@ -64,6 +64,12 @@ class DatabricksJobCreator:
             "provider": "gitHub",
             "branch": "main",
         },
+        "test": {
+            "path": "/Repos/pochireddygari@gmail.com/wgu-assesment-test",
+            "url": "https://github.com/saikumarpochireddygari/wgu-assesment.git",
+            "provider": "gitHub",
+            "branch": "main",
+        },
     }
 
     # Mapping for the location of the environment-specific bundle configuration files.
@@ -71,6 +77,7 @@ class DatabricksJobCreator:
         "dev": "cli_tool/databricks_bundle_config/dev",
         "stage": "cli_tool/databricks_bundle_config/stage",
         "prod": "cli_tool/databricks_bundle_config/prod",
+        "test": "cli_tool/databricks_bundle_config/test",
     }
 
     def __init__(self, bundle_config_path: str, environment: str):
