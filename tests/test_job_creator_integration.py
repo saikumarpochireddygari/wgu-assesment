@@ -50,7 +50,7 @@ class TestJobCreatorIntegration(unittest.TestCase):
           4. Lists jobs and deletes any jobs created as part of the bundle deployment.
         """
         bundle_config_path = "cli_tool/databricks_bundle_config/test/bundle.yaml"
-        creator = DatabricksJobCreator(bundle_config_path, self.env)
+        creator = DatabricksJobCreator(bundle_config_path, "test")
 
         # Deploying job (this will create/update the repo and attempt to deploy jobs)
         creator.deploy_jobs(max_retries=1)
