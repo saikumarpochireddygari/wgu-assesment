@@ -54,6 +54,9 @@ jobs:
           ./utilities_bash_scripts/validate_databricks_token.sh
        
       - name: Run Integration Tests
+        env:
+            DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+            DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
           pytest tests/
 
