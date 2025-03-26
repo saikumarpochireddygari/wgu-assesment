@@ -14,7 +14,7 @@ USER_EMAIL=$(echo "${USER_JSON}" | jq -r '.emails[0].value')
 
 # Validating authorization
 if ! echo "${USER_EMAIL}" | grep -qE "(${ALLOWED_USERS%|})"; then
-  echo "❌ Unauthorized user: ${USER_EMAIL}"
+  echo "❌ Unauthorized user: ${ALLOWED_USERS%|}"
   exit 1
 fi
 
