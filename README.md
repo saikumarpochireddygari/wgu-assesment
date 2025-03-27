@@ -20,6 +20,7 @@ This repository provides a comprehensive framework for managing machine learning
 - [CI/CD Pipeline (GitHub Actions)](#cicd-pipeline-github-actions)
 - [Keychanges Required](#Changes)
 - [Contact](#contact)
+- [Submission Links](#DBXLinks)
 
 
 
@@ -334,3 +335,19 @@ This pipeline is designed to automate the ML production workflow by triggering o
 
 ### Contact
 - **Team MLOPS: mlops@wgu.edu**
+
+### DBXLinks
+
+> Training Job: https://dbc-fa6d2754-4861.cloud.databricks.com/jobs/694735617347035?o=1071962414720300
+
+> Inference Job: https://dbc-fa6d2754-4861.cloud.databricks.com/jobs/831867600770392?o=1071962414720300
+
+> UC Catalog: https://dbc-fa6d2754-4861.cloud.databricks.com/explore/data/prod_catalog?o=1071962414720300
+
+> UC Schema: https://dbc-fa6d2754-4861.cloud.databricks.com/explore/data/prod_catalog/ml_models?o=1071962414720300
+
+> UC Model: https://dbc-fa6d2754-4861.cloud.databricks.com/explore/data/models/prod_catalog/ml_models/iris_model?o=1071962414720300
+
+> UC Volume: https://dbc-fa6d2754-4861.cloud.databricks.com/explore/data/volumes/prod_catalog/ml_models/inference_results?o=1071962414720300
+
+> Mlflow Exp: https://dbc-fa6d2754-4861.cloud.databricks.com/ml/experiments/3021196181930223?o=1071962414720300&searchFilter=&orderByKey=attributes.start_time&orderByAsc=false&startTime=ALL&lifecycleFilter=Active&modelVersionFilter=All+Runs&datasetsFilter=W10%3D
