@@ -330,6 +330,7 @@ This pipeline is designed to automate the ML production workflow by triggering o
 - **Adding Troubleshooting Guidelines**  
 - **Additional References: Best practices across teams @WGU**  
 - **Some Examples for Customizations**  
+- **Using tools like Poetry, TOML, and Tox for enhancing the project by improving dependency management, configuration, and testing.**
 
 ### Contact
 - **Team MLOPS: mlops@wgu.edu**
