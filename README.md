@@ -337,6 +337,7 @@ This pipeline is designed to automate the ML production workflow by triggering o
 - **Additional References: Best practices across teams @WGU**  
 - **Some Examples for Customizations**  
 - **Using tools like Poetry, TOML, and Tox for enhancing the project by improving dependency management, configuration, and testing.**
+- **Cookie Cutter Templates of the best practices.**
 
 ### Contact
 - **Team MLOPS: mlops@wgu.edu**
