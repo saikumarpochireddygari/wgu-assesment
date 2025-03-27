@@ -130,6 +130,11 @@ wgu-assesment/
    DATABRICKS_HOST: e.g., https://<your-databricks-workspace>.cloud.databricks.com
    DATABRICKS_TOKEN: Your Databricks personal access token
 
+5. **Once you have local version ready, Deploy using CI/CD**
+    - Have a git provider's Repo
+    - Setup's secrects for HOST and TOKEN in repo
+    - Push code to git provider's Repo to trigger CI/CD
+
 
 ## Usage
 
